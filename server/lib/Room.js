@@ -29,13 +29,13 @@ class Room extends EventEmitter
 	{
 		logger.info('create() [roomId:%s]', roomId);
 
-		// Create a protoo Room instance.
+		// Create a protoo Room instance. protoo有房间管理功能，类似socketid，且有websocket管理功能
 		const protooRoom = new protoo.Room();
 
 		// Router media codecs.
 		const { mediaCodecs } = config.mediasoup.routerOptions;
 
-		// Create a mediasoup Router.
+		// Create a mediasoup Router. c++ router
 		const mediasoupRouter = await mediasoupWorker.createRouter({ mediaCodecs });
 
 		// Create a mediasoup AudioLevelObserver.
@@ -159,12 +159,13 @@ class Room extends EventEmitter
 	 * @param {Boolean} consume - Whether this peer wants to consume from others.
 	 * @param {protoo.WebSocketTransport} protooWebSocketTransport - The associated
 	 *   protoo WebSocket transport.
+	 * 信令处理，如果客户端发送请求过来之后，会调用这个
 	 */
 	handleProtooConnection({ peerId, consume, protooWebSocketTransport })
 	{
 		const existingPeer = this._protooRoom.getPeer(peerId);
 
-		if (existingPeer)
+		if (existingPeer)//新用户，如果存在
 		{
 			logger.warn(
 				'handleProtooConnection() | there is already a protoo Peer with same peerId, closing it [peerId:%s]',
@@ -203,6 +204,7 @@ class Room extends EventEmitter
 		peer.data.dataProducers = new Map();
 		peer.data.dataConsumers = new Map();
 
+		//客户端不断发出信令过来的一个请求
 		peer.on('request', (request, accept, reject) =>
 		{
 			logger.debug(
@@ -686,7 +688,7 @@ class Room extends EventEmitter
 	 */
 	async _handleProtooRequest(peer, request, accept, reject)
 	{
-		switch (request.method)
+		switch (request.method)//对信令的处理
 		{
 			case 'getRouterRtpCapabilities':
 			{

@@ -397,7 +397,7 @@ async function runProtooWebSocketServer()
 			fragmentationThreshold   : 960000
 		});
 
-	// Handle connections from clients.
+	// Handle connections from clients. 监听连接请求
 	protooWebSocketServer.on('connectionrequest', (info, accept, reject) =>
 	{
 		// The client indicates the roomId and peerId in the URL query.
