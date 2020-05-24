@@ -98,7 +98,7 @@ async function runMediasoupWorkers()
 
 	for (let i = 0; i < numWorkers; ++i)
 	{
-		//根据cpu个数创建worker通过nodejs底层调用fork出多个子进程
+		//根据cpu个数创建worker通过nodejs底层调用fork出多个子进程，会调用到mediasoup库中
 		const worker = await mediasoup.createWorker(
 			{
 				logLevel   : config.mediasoup.workerSettings.logLevel,
@@ -388,7 +388,7 @@ async function runProtooWebSocketServer()
 {
 	logger.info('running protoo WebSocketServer...');
 
-	// Create the protoo WebSocket server.
+	// Create the protoo WebSocket server.    利用protoo启动websocket服务
 	protooWebSocketServer = new protoo.WebSocketServer(httpsServer,
 		{
 			maxReceivedFrameSize     : 960000, // 960 KBytes.
@@ -403,7 +403,7 @@ async function runProtooWebSocketServer()
 		// The client indicates the roomId and peerId in the URL query.
 		const u = url.parse(info.request.url, true);
 		const roomId = u.query['roomId'];
-		const peerId = u.query['peerId'];
+		const peerId = u.query['peerId'];//用户id、用户id
 
 		if (!roomId || !peerId)
 		{
@@ -418,14 +418,15 @@ async function runProtooWebSocketServer()
 
 		// Serialize this code into the queue to avoid that two peers connecting at
 		// the same time with the same roomId create two separate rooms with same
-		// roomId.
+		// roomId.   queue同步队列，防止多人进来冲突
 		queue.push(async () =>
 		{
-			const room = await getOrCreateRoom({ roomId });
+			const room = await getOrCreateRoom({ roomId });//第一个用户创建
 
 			// Accept the protoo WebSocket connection.
 			const protooWebSocketTransport = accept();
 
+			//作各种消息处理，后续学习
 			room.handleProtooConnection({ peerId, protooWebSocketTransport });
 		})
 			.catch((error) =>
