@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+//进程名称
 process.title = 'mediasoup-demo-server';
 process.env.DEBUG = process.env.DEBUG || '*INFO* *WARN* *ERROR*';
 
@@ -64,16 +65,16 @@ async function run()
 	if (process.env.INTERACTIVE === 'true' || process.env.INTERACTIVE === '1')
 		await interactiveClient();
 
-	// Run a mediasoup Worker.
+	// Run a mediasoup Worker. 创建进程，服务启动起来
 	await runMediasoupWorkers();
 
-	// Create Express app.
+	// Create Express app. https业务管理，主要用于broadcaster使用
 	await createExpressApp();
 
 	// Run HTTPS server.
 	await runHttpsServer();
 
-	// Run a protoo WebSocketServer.
+	// Run a protoo WebSocketServer. 发送接收信令，客户端是通过websocket发送信令到服务端的
 	await runProtooWebSocketServer();
 
 	// Log rooms status every X seconds.
@@ -91,12 +92,13 @@ async function run()
  */
 async function runMediasoupWorkers()
 {
-	const { numWorkers } = config.mediasoup;
+	const { numWorkers } = config.mediasoup;//获取cpu个数
 
 	logger.info('running %d mediasoup Workers...', numWorkers);
 
 	for (let i = 0; i < numWorkers; ++i)
 	{
+		//根据cpu个数创建worker通过nodejs底层调用fork出多个子进程
 		const worker = await mediasoup.createWorker(
 			{
 				logLevel   : config.mediasoup.workerSettings.logLevel,
@@ -113,7 +115,7 @@ async function runMediasoupWorkers()
 			setTimeout(() => process.exit(1), 2000);
 		});
 
-		mediasoupWorkers.push(worker);
+		mediasoupWorkers.push(worker);//放到数组中
 
 		// Log worker resource usage every X seconds.
 		setInterval(async () =>

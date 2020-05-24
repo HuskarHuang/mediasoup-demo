@@ -34,6 +34,7 @@ module.exports =
 		numWorkers : Object.keys(os.cpus()).length,
 		// mediasoup WorkerSettings.
 		// See https://mediasoup.org/documentation/v3/mediasoup/api/#WorkerSettings
+		//每个进程就是一个worker
 		workerSettings :
 		{
 			logLevel : 'warn',
@@ -54,9 +55,11 @@ module.exports =
 			],
 			rtcMinPort : process.env.MEDIASOUP_MIN_PORT || 40000,
 			rtcMaxPort : process.env.MEDIASOUP_MAX_PORT || 49999
+			//每个进程10000个端口
 		},
 		// mediasoup Router options.
 		// See https://mediasoup.org/documentation/v3/mediasoup/api/#RouterOptions
+		//就是room的概念，c++用router用router表示，在js用room表示，一对一的关系
 		routerOptions :
 		{
 			mediaCodecs :
@@ -121,14 +124,14 @@ module.exports =
 			[
 				{
 					ip          : process.env.MEDIASOUP_LISTEN_IP || '192.168.1.129',
-					announcedIp : process.env.MEDIASOUP_ANNOUNCED_IP
+					announcedIp : process.env.MEDIASOUP_ANNOUNCED_IP  //外网传输地址
 				}
 			],
-			initialAvailableOutgoingBitrate : 1000000,
+			initialAvailableOutgoingBitrate : 1000000,//初始化码率
 			minimumAvailableOutgoingBitrate : 600000,
 			maxSctpMessageSize              : 262144,
 			// Additional options that are not part of WebRtcTransportOptions.
-			maxIncomingBitrate              : 1500000
+			maxIncomingBitrate              : 1500000 //最大码率
 		},
 		// mediasoup PlainTransport options for legacy RTP endpoints (FFmpeg,
 		// GStreamer).
