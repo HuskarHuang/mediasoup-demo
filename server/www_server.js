@@ -6,8 +6,8 @@ const serve_index = require('serve-index')
 const fs = require('fs')
 
 const options = {
-    key : fs.readFileSync('./cert/'),
-    cert : fs.readFileSync('./cert/')
+    key : fs.readFileSync('./certs/localhost.key.pem'),
+    cert : fs.readFileSync('./certs/localhost.cert.pem')
 }
 
 const app = express()
